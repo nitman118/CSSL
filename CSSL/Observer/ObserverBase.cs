@@ -13,7 +13,7 @@ namespace CSSL.Observer
     /// A base class for all CSSL observers
     /// </summary>
     /// <typeparam name="T">The observable object that is passed for notification information.</typeparam>
-    public abstract class ObserverBase : IIdentity, IName, IObserver<object>, IDisposable
+    public abstract class ObserverBase : IIdentity, IName, IObserver<object>, IDisposable, IGetTime
     {
         /// <summary>
         /// Incremented to store the total number of observers.
@@ -29,7 +29,17 @@ namespace CSSL.Observer
             cancellations = new List<Unsubscriber>();
         }
 
-        public readonly Simulation MySimulation;
+        public int Id { get; }
+
+        public string Name { get; }
+
+        public double GetTime => MySimulation.MyExecutive.Time;
+
+        public double GetPreviousEventTime => MySimulation.MyExecutive.PreviousEventTime;
+
+        public double GetWallClockTime => MySimulation.MyExecutive.WallClockTime;
+
+        protected readonly Simulation MySimulation;
 
         internal void StrictlyDoBeforeReplication()
         {
@@ -45,6 +55,7 @@ namespace CSSL.Observer
         internal void StrictlyDoAfterReplication()
         {
             DoAfterReplication();
+            Writer.Dispose();
         }
 
         protected virtual void DoAfterReplication()
@@ -59,7 +70,7 @@ namespace CSSL.Observer
         /// Subscribes the observer to an observable.
         /// </summary>
         /// <param name="observable">The model element to observe.</param>
-        public void Subscribe(IObservable<object> observable)
+        internal void Subscribe(IObservable<object> observable)
         {
             cancellations.Add((Unsubscriber)observable.Subscribe(this));
         }
@@ -84,10 +95,6 @@ namespace CSSL.Observer
             cancellations.Where(x => x.observable == observable).First().Dispose();
         }
 
-        public int Id { get; }
-
-        public string Name { get; }
-
         /// <summary>
         /// On purpose not an abstract method to prevent obligatory implementation in derived classes. 
         /// </summary>
@@ -101,7 +108,6 @@ namespace CSSL.Observer
 
         public void Dispose()
         {
-            Writer.Dispose();
         }
 
     }

@@ -13,7 +13,7 @@ namespace DataCenterSimulation
     {
         static void Main(string[] args)
         {
-            Simulation sim = new Simulation("SomeSimulation", @"C:\CSSLtest");
+            Simulation sim = new Simulation("DataCenterSimulation", @"C:\CSSL");
 
             // Parameters...
 
@@ -39,19 +39,17 @@ namespace DataCenterSimulation
 
             // The experiment part...
 
-            sim.MyExperiment.NumberOfReplications = 4;
-            sim.MyExperiment.LengthOfReplication = 10;
+            sim.MyExperiment.NumberOfReplications = 3;
+            sim.MyExperiment.LengthOfReplication = 20;
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The observer part...
-            DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
-            dispatcherObserver.Subscribe(dataCenter.Dispatcher);
 
-            DispatcherQueueLengthObserver dispatcherQueueLengthObserver = new DispatcherQueueLengthObserver(sim);
-            dispatcherQueueLengthObserver.Subscribe(dispatcher.Queue);
+            DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
+            dispatcherObserver.Subscribe(dispatcher);
 
             DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
-            dataCenterObserver.Subscribe(dataCenter.Dispatcher);
+            dataCenterObserver.Subscribe(dataCenter);
 
             foreach (ServerPool serverpool in dataCenter.ServerPools)
             {
@@ -59,16 +57,16 @@ namespace DataCenterSimulation
                 serverpoolObserver.Subscribe(serverpool);
             }
 
+            // Run...
+
             sim.Run();
 
-            Console.WriteLine($"Number of jobs dispatched {dataCenter.ServerPools.First().GetNrJobs}. Comp time: {dataCenter.GetWallClockTime}");
+            // The reporting part...
 
             SimulationReporter reporter = sim.MakeSimulationReporter();
 
             reporter.PrintSummaryToFile();
             reporter.PrintSummaryToConsole();
-
-            Console.WriteLine("Test");
         }
     }
 }

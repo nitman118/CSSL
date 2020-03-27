@@ -1,8 +1,10 @@
 ﻿//using CSSL.Examples.AssemblyLineOld;
 //using CSSL.Examples.AssemblyLineOld.AssemblyLineObservers;
+using CSSL.Calendar;
 using CSSL.Examples.AssemblyLine;
 using CSSL.Examples.AssemblyLine.Observers;
 using CSSL.Modeling;
+using CSSL.Modeling.CSSLQueue;
 using CSSL.Utilities.Distributions;
 using System;
 
@@ -15,6 +17,9 @@ namespace LineSim
             Settings.FixSeed = true;
 
             Simulation sim = new Simulation("AssemblyLineSimulation", @"C:\CSSLtest");
+
+            SimpleCalendar calendar = new SimpleCalendar();
+            sim.MyExecutive.SetCalendar(calendar);
 
             AssemblyLine assemblyLine = new AssemblyLine(sim.MyModel, "AssemblyLine", 3);
 

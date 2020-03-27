@@ -15,20 +15,12 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private int totalJobCount;
 
-        private double computationalTime;
-
-        private double simulationTime;
-
-
         protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
-            DataCenter dataCenter = (DataCenter)modelElement.Parent;
+            DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetWallClockTime;
-            simulationTime = dataCenter.Dispatcher.GetTime;
 
-
-            Writer.WriteLine("Simulation Time\tComputational Time\tJob Count");
+            Writer.WriteLine($"Simulation Time,Wall Clock Time,Job Count");
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
@@ -37,13 +29,11 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
-            DataCenter dataCenter = (DataCenter)modelElement.Parent;
+            DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetWallClockTime;
-            simulationTime = dataCenter.Dispatcher.GetTime;
 
-            Writer.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
-            Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
+            Writer.WriteLine($"{dataCenter.GetTime},{dataCenter.GetWallClockTime},{totalJobCount}");
+            //Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
         }
 
         protected override void OnReplicationStart(ModelElementBase modelElement)

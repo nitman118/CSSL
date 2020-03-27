@@ -12,23 +12,12 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling
 {
-    public class Simulation : IDisposable, IName
+    public class Simulation : IDisposable, IName, IGetTime
     {
         public Simulation(string name, string outputDirectory)
         {
             Name = name;
             MyExecutive = new Executive(this);
-            MyModel = new Model(name + "_Model", this);
-            MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
-            MyObservers = new Observers();
-            replicationExecutionProcess = new ReplicationExecutionProcess(this);
-            OutputDirectory = outputDirectory;
-        }
-
-        public Simulation(string name, string outputDirectory, Executive executive)
-        {
-            Name = name;
-            MyExecutive = executive;
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
             MyObservers = new Observers();
@@ -52,9 +41,14 @@ namespace CSSL.Modeling
 
         public string GetEndStateIndicator => replicationExecutionProcess.MyEndStateIndicator.ToString();
 
-        public TimeSpan GetElapsedWallClockTime => replicationExecutionProcess.GetElapsedWallClockTime;
+        public double GetTime => MyExecutive.Time;
 
-        public double GetElapsedSimulationClockTime => MyExecutive.Time;
+        public double GetPreviousEventTime => MyExecutive.PreviousEventTime;
+
+        public double GetWallClockTime => MyExecutive.WallClockTime;
+
+        public TimeSpan GetWallClockTimeSpan => replicationExecutionProcess.GetWallClockTimeSpan;
+
 
         public void Run()
         {
@@ -117,8 +111,8 @@ namespace CSSL.Modeling
             simulation.MyObservers.StrictlyDoBeforeReplication();
             simulation.MyModel.StrictlyDoBeforeReplication();
             simulation.MyExecutive.TryRunAll();
-            simulation.MyObservers.StrictlyDoAfterReplication();
             simulation.MyModel.StrictlyDoAfterReplication();
+            simulation.MyObservers.StrictlyDoAfterReplication();
         }
     }
 }
